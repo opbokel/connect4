@@ -25,10 +25,10 @@ type Board = M.Matrix Int
 
 type Coord = (Int, Int)
 
+boardColIndex = M.fromList 1 boardWidth [1 .. boardWidth]
+
 startBoard :: Board
 startBoard = M.zero boardHeight boardWidth
-
-boardColIndex = M.fromList 1 boardWidth [1 .. boardWidth]
 
 isUsed value = value /= 0
 
@@ -43,18 +43,29 @@ nextFree :: Int -> Board -> Maybe Coord
 nextFree colIndex board = 
     fmap (\rowIndex -> (rowIndex, colIndex)) ((M.safeGetCol colIndex board) >>= nextFreeInColumn)
 
-placePiece :: Player -> Int -> Board -> Maybe (Board, Coord)
+placePiece :: Player -> Int -> Board -> Maybe (Board, Status)
 placePiece player colIndex board = do  
-     coord  <- nextFree colIndex board
-     matrix <- M.safeSet (num player) coord board
-     return (matrix, coord) 
+     coord     <- nextFree colIndex board
+     nextBoard <- M.safeSet (num player) coord board
+     let status = getStatus player coord nextBoard 
+     return (nextBoard, status) 
 
 checkWin :: Player -> Coord -> Board -> Bool
 checkWin player coord board = False -- To be done
 
+checkFull :: Board -> Bool
+checkFull board = False -- To be done
+
+getStatus :: Player -> Coord -> Board -> Status
+getStatus player coord board 
+    | checkWin player coord board = Victory
+    | checkFull board = Draw
+    | otherwise = Running
+
+
 main :: IO ()
 main = do
-    putStrLn ("Functional Connect " ++ show toWinLength ++ "\n At any time, enter q to quit or r to restart")
+    putStrLn ("Functional Connect " ++ show toWinLength ++ "\nAt any time, enter q to quit or r to restart:")
     play Player1 startBoard                                
     
 
@@ -63,9 +74,15 @@ play player board = do
     putStrLn (show boardColIndex)
     putStrLn (show board)
     putStrLn ((show player) ++ " next move (1 to " ++ (show boardWidth) ++ ") ?")
--- line <- getLine
+    line <- getLine
+    readLine line
 
+readLine :: [Char] -> IO ()
+readLine "r" = main
+readLine "q" = putStrLn "The game will end now!"
+readLine   x = return ()
 
+-- readLetter l = IO ()
 
 
 
