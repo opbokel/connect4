@@ -1,2 +1,2 @@
-# connect4
+# Connect4
 A Connect4 game made with Haskell
