@@ -49,14 +49,14 @@ placePiece :: Int -> State -> Maybe (State, Status)
 placePiece colIndex state = do  
      coord     <- nextFree colIndex (board state)
      nextBoard <- M.safeSet (num $ player state) coord (board state)
-     let status = getStatus coord (State (player state) nextBoard) -- Current player turn after placing the piece
+     let status = getStatus coord (State (player state) nextBoard) -- Current player turn after placing the piece.
      return (State (next (player state)) nextBoard, status) 
 
 checkWin :: Coord -> State -> Bool
 checkWin coord state = False -- To be done
 
 checkFull :: Board -> Bool
-checkFull board = False -- To be done
+checkFull board = all isUsed (M.toList board)
 
 getStatus :: Coord -> State -> Status
 getStatus coord state 
@@ -90,7 +90,7 @@ processLine line state = proccessColIndex (readMaybe line :: Maybe Int) state
 
 startNewGame :: IO ()
 startNewGame = do
-    putStrLn "Will start a new game!\n"
+    putStrLn "\nA new game will start!\n"
     main
 
 proccessColIndex :: Maybe Int -> State -> IO ()
