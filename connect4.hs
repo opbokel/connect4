@@ -34,33 +34,64 @@ startBoard = M.zero boardHeight boardWidth
 
 isUsed value = value /= 0
 
-validRowOrNothing :: Int -> Maybe Int
-validRowOrNothing rowIndex = if (rowIndex < 1 || rowIndex > boardHeight) then Nothing else Just rowIndex 
+maybeRow :: Int -> Maybe Int
+maybeRow rowIndex = if (rowIndex < 1 || rowIndex > boardHeight) then Nothing else Just rowIndex 
 
 nextFreeInColumn :: V.Vector Int -> Maybe Int
-nextFreeInColumn column = validRowOrNothing (fromMaybe (V.length column) (V.findIndex isUsed column))
+nextFreeInColumn column = maybeRow (fromMaybe (V.length column) (V.findIndex isUsed column))
 
 -- Matrix index starts at 1
 nextFree :: Int -> Board -> Maybe Coord
-nextFree colIndex board = 
-    fmap (\rowIndex -> (rowIndex, colIndex)) ((M.safeGetCol colIndex board) >>= nextFreeInColumn)
+nextFree colIndex board = do
+    column   <- M.safeGetCol colIndex board
+    rowIndex <- nextFreeInColumn column
+    return (rowIndex, colIndex)
 
 placePiece :: Int -> State -> Maybe (State, Status)
 placePiece colIndex state = do  
      coord     <- nextFree colIndex (board state)
      nextBoard <- M.safeSet (num $ player state) coord (board state)
      let status = getStatus coord (State (player state) nextBoard) -- Current player turn after placing the piece.
-     return (State (next (player state)) nextBoard, status) 
+     return (State (next (player state)) nextBoard, status)
 
-checkWin :: Coord -> State -> Bool
-checkWin coord state = False -- To be done
+getOrElse :: Coord -> State -> Int -> Int
+getOrElse coord state fallback = (fromMaybe fallback (M.safeGet (fst coord) (snd coord) (board state)))
+
+isPlayerPiece :: Coord -> State -> Bool
+isPlayerPiece coord state = (getOrElse coord state 0) == (num $ player state)
+
+addCoord :: Coord -> Coord -> Coord
+addCoord (y1, x1) (y2, x2) = (y1 + y2, x1 + x2)
+
+reverseCoord :: Coord -> Coord
+reverseCoord (y, x) = (-y, -x)
+
+countPlayerPieces :: Coord -> Coord -> State -> Int
+countPlayerPieces startPoint direction state = do
+    let nextCoord = addCoord startPoint direction
+    if isPlayerPiece nextCoord state  
+        then 1 + countPlayerPieces nextCoord direction state
+        else 0
+
+isVictoryLine :: Coord  -> Coord -> State -> Bool
+isVictoryLine startPoint direction state = 
+    (countPlayerPieces startPoint direction state) + 1 
+        + (countPlayerPieces startPoint (reverseCoord direction) state)
+        >= toWinLength
+
+checkVictory :: Coord -> State -> Bool
+checkVictory startPoint state = 
+    isVictoryLine startPoint (1,0) state
+        || isVictoryLine startPoint (1,1) state
+        || isVictoryLine startPoint (0,1) state
+        || isVictoryLine startPoint (1,-1) state
 
 checkFull :: Board -> Bool
 checkFull board = all isUsed (M.toList board)
 
 getStatus :: Coord -> State -> Status
 getStatus coord state 
-    | checkWin coord state = Victory
+    | checkVictory coord state = Victory
     | checkFull (board state) = Draw
     | otherwise = Running
 
@@ -99,7 +130,6 @@ proccessColIndex Nothing state = do
     play state
 
 proccessColIndex (Just colIndex) state = processNextState state (placePiece colIndex state)
-
 
 processNextState :: State -> Maybe (State, Status) -> IO ()
 processNextState currentState Nothing = do
