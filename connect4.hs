@@ -5,7 +5,7 @@ import Text.Read
 
 boardWidth = 7
 boardHeight = 6
-toVictoryLength = 4
+connectLength = 4
 
 data Status = Draw | Victory | Running deriving Eq
 
@@ -77,7 +77,7 @@ isVictoryLine :: Coord  -> Coord -> State -> Bool
 isVictoryLine startPoint direction state = 
     (countPlayerPieces startPoint direction state) + 1 
         + (countPlayerPieces startPoint (reverseCoord direction) state)
-        >= toVictoryLength
+        >= connectLength
 
 checkVictory :: Coord -> State -> Bool
 checkVictory startPoint state = 
@@ -99,7 +99,7 @@ getStatus coord state
 
 main :: IO ()
 main = do
-    putStrLn $ "Functional Connect " ++ show toVictoryLength ++ "\nAt any time, enter q to quit or r to restart:"
+    putStrLn $ "Functional Connect " ++ show connectLength ++ "\nAt any time, enter q to quit or r to restart:"
     play (State Player1 startBoard)                                
     
 printBoard :: State -> IO ()

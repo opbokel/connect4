@@ -6,7 +6,7 @@ Can be made connect N of any board size by changing:
 ```
 boardWidth = 7
 boardHeight = 6
-toVictoryLength = 4
+connectLength = 4
 ```
 
 This is my very first code in Haskell made for educational purposes.
