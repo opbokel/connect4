@@ -25,8 +25,7 @@ walkWhile :: (a -> Bool) -> Coord -> Coord -> Matrix a -> Int
 walkWhile predicate startPoint direction matrix = 
     let nextCoord         = addCoord startPoint direction
         maybeNext         = safeGetCoord nextCoord matrix
-        predicateInDomain = (fromMaybe False) . (fmap predicate)
-    in if (predicateInDomain maybeNext)
+    in if ((fromMaybe False) . (fmap predicate) $ maybeNext)
         then 1 + walkWhile predicate nextCoord direction matrix
         else 0
 
