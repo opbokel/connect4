@@ -5,10 +5,12 @@ module Matrix
 , safeGetCoord
 , walkWhile
 , walkWhileSame
+, findInColumnBy
 ) where  
 
 import Data.Matrix
 import Data.Maybe
+import qualified Data.Vector as V
 
 type Coord = (Int, Int)
 
@@ -29,11 +31,20 @@ walkWhile predicate startPoint direction matrix =
         then 1 + walkWhile predicate nextCoord direction matrix
         else 0
 
+
 walkWhileSame :: (Eq a) => Coord -> Coord -> Matrix a -> Int
 walkWhileSame startPoint direction matrix = 
     fromMaybe 0 maybeWalkWhile
     where
         maybeWalkWhile = do
-            predicate <- fmap (\v -> (== v)) (safeGetCoord startPoint matrix)
+            predicate <- fmap (\a -> (== a)) (safeGetCoord startPoint matrix)
             return $ walkWhile predicate startPoint direction matrix
+
+
+findInColumnBy :: (a -> Bool) -> Int -> Matrix a -> Maybe Coord
+findInColumnBy predicate colIndex matrix = do
+    column      <- safeGetCol colIndex matrix
+    vectorIndex <- V.findIndex predicate column
+    return (vectorIndex + 1, colIndex) -- Matrix index starts at 1
+
 

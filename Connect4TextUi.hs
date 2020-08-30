@@ -1,5 +1,6 @@
 import Connect4
 import Text.Read
+import qualified Data.Matrix as M
 
 -- WARNING: Side effects beyond this point!
 
@@ -10,6 +11,7 @@ main = do
     
 printBoard :: State -> IO ()
 printBoard state = do 
+    let boardColIndex = M.fromList 1 boardWidth [1 .. boardWidth]
     putStrLn $ show boardColIndex
     putStrLn $ show (board state)
 
