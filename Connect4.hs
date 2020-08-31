@@ -12,7 +12,6 @@ module Connect4
 
 import qualified Data.Matrix as M
 import Matrix
-import qualified Data.Vector as V
 import Data.Maybe
 
 boardWidth = 7
@@ -55,9 +54,8 @@ placePiece colIndex (State player board) = do
 
 isVictoryLine :: Coord  -> Board -> Coord -> Bool
 isVictoryLine startPoint board direction = 
-    (walkWhileSame startPoint direction board) + 1 
-        + (walkWhileSame startPoint (inverseCoord direction) board)
-        >= connectLength
+    let walk = walkWhileSame startPoint board
+    in walk direction + 1 + walk (inverseCoord direction) >= connectLength
 
 checkVictory :: Coord -> Board -> Bool
 checkVictory startPoint board = 

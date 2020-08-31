@@ -23,22 +23,22 @@ inverseCoord (y, x) = (-y, -x)
 safeGetCoord :: Coord -> Matrix a -> Maybe a
 safeGetCoord (y, x) = safeGet y x
 
-walkWhile :: (a -> Bool) -> Coord -> Coord -> Matrix a -> Int
-walkWhile predicate startPoint direction matrix = 
+walkWhile :: (a -> Bool) -> Coord -> Matrix a -> Coord -> Int
+walkWhile predicate startPoint matrix direction = 
     let nextCoord = addCoord startPoint direction
         maybeNext = safeGetCoord nextCoord matrix
     in if ((fromMaybe False) . (fmap predicate) $ maybeNext)
-        then 1 + walkWhile predicate nextCoord direction matrix
+        then 1 + walkWhile predicate nextCoord matrix direction
         else 0
 
 
-walkWhileSame :: (Eq a) => Coord -> Coord -> Matrix a -> Int
-walkWhileSame startPoint direction matrix = 
+walkWhileSame :: (Eq a) => Coord -> Matrix a -> Coord -> Int
+walkWhileSame startPoint matrix direction = 
     fromMaybe 0 maybeWalkWhile
     where
         maybeWalkWhile = do
             predicate <- fmap (\a -> (== a)) (safeGetCoord startPoint matrix)
-            return $ walkWhile predicate startPoint direction matrix
+            return $ walkWhile predicate startPoint matrix direction
 
 
 findInColumnBy :: (a -> Bool) -> Int -> Matrix a -> Maybe Coord
