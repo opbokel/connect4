@@ -6,8 +6,8 @@ module Connect4
 , boardWidth
 , boardHeight
 , connectLength
-, placePiece
 , newGameState
+, placePiece
 ) where
 
 import qualified Data.Matrix as M
@@ -53,18 +53,16 @@ placePiece colIndex (State player board) = do
     return (State (next player) nextBoard, status)
 
 
-isVictoryLine :: Coord  -> Coord -> Board -> Bool
-isVictoryLine startPoint direction board = 
+isVictoryLine :: Coord  -> Board -> Coord -> Bool
+isVictoryLine startPoint board direction = 
     (walkWhileSame startPoint direction board) + 1 
         + (walkWhileSame startPoint (inverseCoord direction) board)
         >= connectLength
 
 checkVictory :: Coord -> Board -> Bool
 checkVictory startPoint board = 
-    isVictoryLine startPoint (1,0) board
-        || isVictoryLine startPoint (1,1) board
-        || isVictoryLine startPoint (0,1) board
-        || isVictoryLine startPoint (1,-1) board
+    let isVictory = isVictoryLine startPoint board
+    in isVictory (1,0) || isVictory (1,1) || isVictory (0,1) || isVictory (1,-1)
 
 checkFull :: Board -> Bool
 checkFull board = all isUsed (M.toList board)
