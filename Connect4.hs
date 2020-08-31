@@ -43,10 +43,12 @@ newGameState = State Player1 startBoard
 
 isUsed value = value /= 0
 
+table :: Int -> (Int, Int) -- Table is bellow the board
+table colIndex = (boardHeight + 1, colIndex)
+
 placePiece :: Int -> State -> Maybe (State, Status)
 placePiece colIndex (State player board) = do
-    let table        = (boardHeight + 1, colIndex) -- Table is bellow the board
-    let findOrTable  = (fromMaybe table) . (findInColumnBy isUsed colIndex) 
+    let findOrTable  = (fromMaybe (table colIndex)) . (findInColumnBy isUsed colIndex) 
     let toPlaceCoord = (addCoord (-1, 0)) . findOrTable $ board
     nextBoard        <- M.safeSet (num player) toPlaceCoord board
     let status       = getStatus toPlaceCoord nextBoard
