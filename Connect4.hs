@@ -45,8 +45,8 @@ isUsed value = value /= 0
 
 placePiece :: Int -> State -> Maybe (State, Status)
 placePiece colIndex (State player board) = do
-    let findOrBottom = (fromMaybe (boardHeight + 1, colIndex)) . (findInColumnBy isUsed colIndex)
-    let toPlaceCoord = (addCoord (-1, 0)) . findOrBottom $ board
+    let findOrTable  = (fromMaybe (boardHeight + 1, colIndex)) . (findInColumnBy isUsed colIndex)
+    let toPlaceCoord = (addCoord (-1, 0)) . findOrTable $ board
     nextBoard        <- M.safeSet (num player) toPlaceCoord board
     let status       = getStatus toPlaceCoord nextBoard
     return (State (next player) nextBoard, status)
