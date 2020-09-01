@@ -1,7 +1,7 @@
 module Matrix  
 ( Coord  
 , addCoord
-, inverseCoord
+, inverseDirection
 , safeGetCoord
 , walkWhile
 , walkWhileSame
@@ -13,17 +13,18 @@ import Data.Maybe
 import qualified Data.Vector as V
 
 type Coord = (Int, Int)
+type Direction = Coord
 
 addCoord :: Coord -> Coord -> Coord
 addCoord (y1, x1) (y2, x2) = (y1 + y2, x1 + x2)
 
-inverseCoord :: Coord -> Coord
-inverseCoord (y, x) = (-y, -x)
+inverseDirection :: Direction -> Direction
+inverseDirection (y, x) = (-y, -x)
 
 safeGetCoord :: Coord -> Matrix a -> Maybe a
 safeGetCoord (y, x) = safeGet y x
 
-walkWhile :: (a -> Bool) -> Coord -> Matrix a -> Coord -> Int
+walkWhile :: (a -> Bool) -> Coord -> Matrix a -> Direction -> Int
 walkWhile predicate startPoint matrix direction = 
     let nextCoord = addCoord startPoint direction
         maybeNext = safeGetCoord nextCoord matrix
@@ -32,7 +33,7 @@ walkWhile predicate startPoint matrix direction =
         else 0
 
 
-walkWhileSame :: (Eq a) => Coord -> Matrix a -> Coord -> Int
+walkWhileSame :: (Eq a) => Coord -> Matrix a -> Direction -> Int
 walkWhileSame startPoint matrix direction = 
     fromMaybe 0 maybeWalkWhile
     where

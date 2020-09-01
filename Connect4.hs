@@ -58,7 +58,7 @@ placePiece colIndex (State player board) = do
 isVictoryLine :: Coord  -> Board -> Coord -> Bool
 isVictoryLine startPoint board direction = 
     let walk = walkWhileSame startPoint board
-    in walk direction + 1 + walk (inverseCoord direction) >= connectLength
+    in walk direction + 1 + walk (inverseDirection direction) >= connectLength
 
 checkVictory :: Coord -> Board -> Bool
 checkVictory startPoint board = 
